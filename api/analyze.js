@@ -15,7 +15,10 @@ const SYSTEM_PROMPT = `あなたは「AIジョニー」。恋愛式学（16タ�
 刺さる言葉・NGな言動
 
 手がかりが少ない場合は、断定を避け「〜の傾向が強い」といった仮説ベースの表現にすること。
-個人を傷つけたり不快にさせたりする表現は避けること。`;
+個人を傷つけたり不快にさせたりする表現は避けること。
+
+なお、最初の診断のあとにユーザーから追加の質問が来た場合は、上記の4セクション構成に縛られず、
+その質問に自然な会話文（Markdown可）で答えてよい。診断結果を踏まえた具体的なアドバイスを続けること。`;
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -30,30 +33,38 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { images, note } = req.body || {};
-    const imageList = Array.isArray(images) ? images : [];
-    const noteText = typeof note === 'string' ? note.trim() : '';
+    let { messages, images, note } = req.body || {};
 
-    if (imageList.length === 0 && !noteText) {
-      res.status(400).json({ error: '画像またはテキストを1つ以上指定してください' });
-      return;
+    // 旧形式（画像・メモのみ）との互換: messagesが無ければ1ターン分を組み立てる
+    if (!Array.isArray(messages)) {
+      const imageList = Array.isArray(images) ? images : [];
+      const noteText = typeof note === 'string' ? note.trim() : '';
+      if (imageList.length === 0 && !noteText) {
+        res.status(400).json({ error: '画像またはテキストを1つ以上指定してください' });
+        return;
+      }
+      const content = [];
+      imageList.slice(0, 8).forEach((img) => {
+        if (img && img.data && img.media_type) {
+          content.push({
+            type: 'image',
+            source: { type: 'base64', media_type: img.media_type, data: img.data },
+          });
+        }
+      });
+      content.push({
+        type: 'text',
+        text: noteText
+          ? `プロフィール文章・メモ:\n${noteText}\n\n上記の画像とテキストから恋愛式学タイプを診断してください。`
+          : '上記の画像から恋愛式学タイプを診断してください。',
+      });
+      messages = [{ role: 'user', content }];
     }
 
-    const content = [];
-    imageList.slice(0, 8).forEach((img) => {
-      if (img && img.data && img.media_type) {
-        content.push({
-          type: 'image',
-          source: { type: 'base64', media_type: img.media_type, data: img.data },
-        });
-      }
-    });
-    content.push({
-      type: 'text',
-      text: noteText
-        ? `プロフィール文章・メモ:\n${noteText}\n\n上記の画像とテキストから恋愛式学タイプを診断してください。`
-        : '上記の画像から恋愛式学タイプを診断してください。',
-    });
+    if (!Array.isArray(messages) || messages.length === 0) {
+      res.status(400).json({ error: 'messagesが空です' });
+      return;
+    }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -66,7 +77,7 @@ module.exports = async (req, res) => {
         model: 'claude-sonnet-4-5',
         max_tokens: 1500,
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content }],
+        messages,
       }),
     });
 

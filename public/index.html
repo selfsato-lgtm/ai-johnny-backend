@@ -22,6 +22,10 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   border-bottom:1px solid #2a2a4a;background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
   position:sticky;top:0;z-index:60}
 .hamburger{font-size:20px;cursor:pointer;color:var(--light);background:none;border:none;padding:4px;line-height:1}
+.portal-back{flex-shrink:0;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);
+  border:1px solid #3a3a5a;border-radius:20px;padding:7px 14px;
+  font-size:11.5px;color:var(--light);text-decoration:none}
+.portal-back:hover{border-color:var(--gold);color:var(--gold)}
 .avatar{width:34px;height:34px;border-radius:50%;background:var(--purple);
   display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .titles{min-width:0}
@@ -82,6 +86,17 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .analyze-btn:disabled{opacity:.4;cursor:default}
 .analyze-btn:hover:not(:disabled){filter:brightness(1.08)}
 
+.chat-input-row{display:flex;gap:8px;margin-top:16px;position:sticky;bottom:0;
+  background:var(--bg);padding:10px 0}
+.chat-input{flex:1;background:var(--card2);border:1px solid #2a2a4a;border-radius:20px;
+  padding:10px 16px;font-size:13px;color:var(--light);font-family:inherit}
+.chat-input::placeholder{color:var(--muted)}
+.chat-input:focus{outline:none;border-color:var(--gold)}
+.chat-send-btn{flex-shrink:0;font-size:13px;padding:10px 18px;border-radius:20px;
+  border:none;background:var(--gold);color:var(--bg);font-weight:900;cursor:pointer}
+.chat-send-btn:disabled{opacity:.4;cursor:default}
+.chat-send-btn:hover:not(:disabled){filter:brightness(1.08)}
+
 /* chat area */
 .chat-log{display:flex;flex-direction:column;gap:14px}
 .msg-user{align-self:flex-end;background:var(--card2);border-radius:14px 14px 4px 14px;
@@ -112,6 +127,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
 <div class="app">
   <div class="topbar">
+    <a class="portal-back" href="https://selfsato-lgtm.github.io/love-quest/">← ポータルへ戻る</a>
     <button class="hamburger" onclick="toggleSidebar()">☰</button>
     <div class="avatar">🧠</div>
     <div class="titles">
@@ -149,6 +165,11 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
         <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()" disabled>🔍 分析する</button>
 
         <div class="chat-log" id="chatLog"></div>
+
+        <div class="chat-input-row" id="chatInputRow" style="display:none">
+          <input type="text" class="chat-input" id="chatInput" placeholder="AIジョニーに追加で質問する...">
+          <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">送信</button>
+        </div>
       </div>
     </div>
   </div>
@@ -156,6 +177,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
 <script>
 let uploadedFiles = [];
+let conversation = []; // Anthropicのmessages形式の会話履歴
 
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('collapsed');
@@ -330,17 +352,15 @@ function renderResultText(text){
   return html;
 }
 
-async function runAnalysis(){
-  const note = document.getElementById('textNote').value.trim();
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
+// userContent(Anthropicのcontent配列)を会話履歴に積み、APIを呼んで結果をチャットログに表示する共通処理
+async function sendToJohnny(userContent, userDisplayText){
+  conversation.push({ role: 'user', content: userContent });
 
   const log = document.getElementById('chatLog');
 
   const userMsg = document.createElement('div');
   userMsg.className = 'msg-user';
-  const fileSummary = uploadedFiles.length ? `📎 ${uploadedFiles.length}件のファイル` : '';
-  userMsg.textContent = [fileSummary, note].filter(Boolean).join(' / ') || '（分析リクエスト）';
+  userMsg.textContent = userDisplayText || '（分析リクエスト）';
   log.appendChild(userMsg);
 
   const typingBubble = document.createElement('div');
@@ -348,6 +368,42 @@ async function runAnalysis(){
   typingBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body"><div class="typing"><span></span><span></span><span></span></div></div>`;
   log.appendChild(typingBubble);
   typingBubble.scrollIntoView({behavior:'smooth', block:'end'});
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: conversation }),
+    });
+    const data = await res.json();
+
+    typingBubble.remove();
+    const resultBubble = document.createElement('div');
+    resultBubble.className = 'bubble';
+    if(!res.ok || data.error){
+      conversation.pop(); // 失敗したリクエストは履歴から取り除く
+      resultBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">${escapeHtml(data.error || '分析に失敗しました')}</p></div>`;
+    } else {
+      conversation.push({ role: 'assistant', content: [{ type: 'text', text: data.result }] });
+      resultBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(data.result)}</div>`;
+      document.getElementById('chatInputRow').style.display = 'flex';
+    }
+    log.appendChild(resultBubble);
+    resultBubble.scrollIntoView({behavior:'smooth', block:'start'});
+  } catch (err) {
+    conversation.pop();
+    typingBubble.remove();
+    const errBubble = document.createElement('div');
+    errBubble.className = 'bubble';
+    errBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">通信エラー: ${escapeHtml(err.message)}</p></div>`;
+    log.appendChild(errBubble);
+  }
+}
+
+async function runAnalysis(){
+  const note = document.getElementById('textNote').value.trim();
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
 
   try {
     const images = [];
@@ -360,39 +416,54 @@ async function runAnalysis(){
       }
     }
 
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ images, note }),
+    const content = [];
+    images.forEach(img => {
+      content.push({ type: 'image', source: { type: 'base64', media_type: img.media_type, data: img.data } });
     });
-    const data = await res.json();
+    content.push({
+      type: 'text',
+      text: note
+        ? `プロフィール文章・メモ:\n${note}\n\n上記の画像とテキストから恋愛式学タイプを診断してください。`
+        : '上記の画像から恋愛式学タイプを診断してください。',
+    });
 
-    typingBubble.remove();
-    const resultBubble = document.createElement('div');
-    resultBubble.className = 'bubble';
-    if(!res.ok || data.error){
-      resultBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">${escapeHtml(data.error || '分析に失敗しました')}</p></div>`;
-    } else {
-      resultBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(data.result)}</div>`;
-    }
-    log.appendChild(resultBubble);
-    resultBubble.scrollIntoView({behavior:'smooth', block:'start'});
-  } catch (err) {
-    typingBubble.remove();
-    const errBubble = document.createElement('div');
-    errBubble.className = 'bubble';
-    errBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">通信エラー: ${escapeHtml(err.message)}</p></div>`;
-    log.appendChild(errBubble);
+    const fileSummary = uploadedFiles.length ? `📎 ${uploadedFiles.length}件のファイル` : '';
+    const displayText = [fileSummary, note].filter(Boolean).join(' / ') || '（分析リクエスト）';
+
+    await sendToJohnny(content, displayText);
   } finally {
     btn.disabled = false;
   }
 }
 
+async function sendChatMessage(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+
+  const sendBtn = document.getElementById('chatSendBtn');
+  sendBtn.disabled = true;
+  input.value = '';
+
+  await sendToJohnny([{ type: 'text', text }], text);
+
+  sendBtn.disabled = false;
+  input.focus();
+}
+document.getElementById('chatInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.isComposing){
+    e.preventDefault();
+    sendChatMessage();
+  }
+});
+
 function resetChat(){
   uploadedFiles = [];
+  conversation = [];
   document.getElementById('textNote').value = '';
   document.getElementById('fileList').innerHTML = '';
   document.getElementById('chatLog').innerHTML = '';
+  document.getElementById('chatInputRow').style.display = 'none';
   updateAnalyzeBtn();
 }
 </script>
