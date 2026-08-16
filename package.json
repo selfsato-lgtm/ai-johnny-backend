@@ -1,0 +1,6 @@
+{
+  "name": "ai-johnny-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AIジョニー: 恋愛式学タイプ診断ツール（Vercel Serverless Functions + Anthropic API）"
+}
