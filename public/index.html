@@ -60,11 +60,10 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   border:1px solid #2a2a4a;border-radius:8px;padding:4px;min-width:90px;
   box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .hi-menu button{display:block;width:100%;text-align:left;background:none;border:none;
-  color:var(--red);font-size:11px;padding:6px 8px;border-radius:6px;cursor:pointer}
-.hi-menu button:hover{background:rgba(233,69,96,.15)}
-.history-export-btn{width:100%;margin-top:8px;font-size:10.5px;padding:8px;border-radius:8px;
-  border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
-.history-export-btn:hover{border-color:var(--gold);color:var(--gold)}
+  color:var(--light);font-size:11px;padding:6px 8px;border-radius:6px;cursor:pointer}
+.hi-menu button:hover{background:var(--card)}
+.hi-menu button.hi-danger{color:var(--red)}
+.hi-menu button.hi-danger:hover{background:rgba(233,69,96,.15)}
 
 .main{flex:1;min-width:0;padding:20px 16px}
 .main-inner{max-width:620px;margin:0 auto}
@@ -161,7 +160,6 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
       <div class="sidebar-label">分析履歴</div>
       <input type="text" class="history-search" id="historySearch" placeholder="🔍 履歴を検索..." oninput="renderHistory()">
       <div id="historyList"></div>
-      <button class="history-export-btn" id="exportHistoryBtn" onclick="exportHistory()">📤 全履歴をエクスポート</button>
     </div>
 
     <div class="main">
@@ -199,7 +197,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 <script>
 let uploadedFiles = [];
 let conversation = []; // Anthropicのmessages形式の会話履歴
-let history = []; // 過去の分析セッションの履歴 [{label, time}]
+let history = []; // 過去の分析セッションの履歴 [{label, time, messages}]
 let currentSessionStarted = false; // 今の会話をすでに履歴に記録したか
 
 function loadHistory(){
@@ -216,7 +214,7 @@ function renderHistory(){
   const query = (document.getElementById('historySearch').value || '').trim().toLowerCase();
   const filtered = history
     .map((h, idx) => ({ ...h, idx }))
-    .filter(h => !query || h.label.toLowerCase().includes(query) || (h.result || '').toLowerCase().includes(query));
+    .filter(h => !query || h.label.toLowerCase().includes(query) || historyToText(h).toLowerCase().includes(query));
 
   if(history.length === 0){
     list.innerHTML = '<div class="history-empty">まだ履歴はありません。<br>分析すると、ここに<br>記録されます。</div>';
@@ -234,14 +232,16 @@ function renderHistory(){
       </div>
       <span class="hi-time">${escapeHtml(h.time)}</span>
       <div class="hi-menu" id="hiMenu-${h.idx}" style="display:none">
-        <button onclick="deleteHistoryEntry(${h.idx})">🗑 削除</button>
+        <button onclick="exportHistoryEntry(${h.idx})">📤 エクスポート</button>
+        <button class="hi-danger" onclick="deleteHistoryEntry(${h.idx})">🗑 削除</button>
       </div>
     </div>
   `).join('');
 }
-function addHistoryEntry(label, result){
+function addHistoryEntry(label){
   const time = new Date().toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
-  history.unshift({ label: label.slice(0, 40) || '（分析リクエスト）', time, result: result || '' });
+  // conversationと同じ配列を参照させる（このセッションで続くやり取りも自動的に反映される）
+  history.unshift({ label: label.slice(0, 40) || '（分析リクエスト）', time, messages: conversation });
   saveHistory();
   renderHistory();
 }
@@ -261,19 +261,24 @@ function deleteHistoryEntry(idx){
   saveHistory();
   renderHistory();
 }
-function exportHistory(){
-  if(history.length === 0){
-    alert('履歴がありません');
-    return;
-  }
-  const text = history.map(h =>
-    `【${h.time}】${h.label}\n${h.result || '(本文なし)'}\n${'-'.repeat(30)}`
-  ).join('\n\n');
+// 会話履歴(messages)を読める形のテキストに変換
+function historyToText(h){
+  return (h.messages || []).map(m => {
+    const role = m.role === 'user' ? 'あなた' : 'AIジョニー';
+    const texts = (m.content || []).filter(c => c.type === 'text').map(c => c.text);
+    const hasImage = (m.content || []).some(c => c.type === 'image');
+    return `【${role}】\n` + (hasImage ? '[画像添付]\n' : '') + texts.join('\n');
+  }).join('\n\n' + '-'.repeat(30) + '\n\n');
+}
+function exportHistoryEntry(idx){
+  const h = history[idx];
+  if(!h) return;
+  const text = `AIジョニー 分析ログ\n【${h.time}】${h.label}\n${'='.repeat(30)}\n\n${historyToText(h)}`;
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `AIジョニー_分析履歴_${new Date().toISOString().slice(0,10)}.txt`;
+  a.download = `AIジョニー_${h.label.replace(/[\\/:*?"<>|]/g, '')}_${h.time.replace(/[\s:\/]/g, '')}.txt`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -490,7 +495,9 @@ async function sendToJohnny(userContent, userDisplayText){
       document.getElementById('chatInputRow').style.display = 'flex';
       if(!currentSessionStarted){
         currentSessionStarted = true;
-        addHistoryEntry(userDisplayText, data.result);
+        addHistoryEntry(userDisplayText);
+      } else {
+        saveHistory(); // 追質問のやり取りも同じ履歴エントリに反映させる
       }
     }
     log.appendChild(resultBubble);
