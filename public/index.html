@@ -499,9 +499,13 @@ function resetChat(){
   conversation = [];
   currentSessionStarted = false;
   document.getElementById('textNote').value = '';
+  document.getElementById('fileInput').value = '';
   document.getElementById('fileList').innerHTML = '';
   document.getElementById('chatLog').innerHTML = '';
+  document.getElementById('chatInput').value = '';
   updateAnalyzeBtn();
+  document.querySelector('.main').scrollTo({top: 0, behavior: 'smooth'});
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 loadHistory();
