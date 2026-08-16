@@ -166,8 +166,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
         <div class="chat-log" id="chatLog"></div>
 
-        <div class="chat-input-row" id="chatInputRow" style="display:none">
-          <input type="text" class="chat-input" id="chatInput" placeholder="AIジョニーに追加で質問する...">
+        <div class="chat-input-row" id="chatInputRow">
+          <input type="text" class="chat-input" id="chatInput" placeholder="AIジョニーに質問する（写真がなくてもOK）...">
           <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">送信</button>
         </div>
       </div>
@@ -463,7 +463,6 @@ function resetChat(){
   document.getElementById('textNote').value = '';
   document.getElementById('fileList').innerHTML = '';
   document.getElementById('chatLog').innerHTML = '';
-  document.getElementById('chatInputRow').style.display = 'none';
   updateAnalyzeBtn();
 }
 </script>
