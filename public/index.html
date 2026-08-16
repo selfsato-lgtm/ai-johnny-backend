@@ -46,6 +46,11 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .history-item{font-size:11px;padding:8px;border-radius:8px;color:var(--muted);
   margin-bottom:3px;cursor:default}
 .history-empty{font-size:10.5px;color:var(--muted);padding:8px;line-height:1.6;text-align:center}
+.history-item{font-size:11px;padding:8px;border-radius:8px;color:var(--light);
+  margin-bottom:3px;cursor:pointer;background:var(--card);border:1px solid transparent}
+.history-item:hover{border-color:var(--gold)}
+.history-item .hi-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.history-item .hi-time{font-size:9.5px;color:var(--muted);margin-top:2px}
 
 .main{flex:1;min-width:0;padding:20px 16px}
 .main-inner{max-width:620px;margin:0 auto}
@@ -140,7 +145,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   <div class="layout">
     <div class="sidebar" id="sidebar">
       <div class="sidebar-label">分析履歴</div>
-      <div class="history-empty">まだ履歴はありません。<br>分析すると、ここに<br>記録されます。</div>
+      <div id="historyList"></div>
     </div>
 
     <div class="main">
@@ -178,6 +183,34 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 <script>
 let uploadedFiles = [];
 let conversation = []; // Anthropicのmessages形式の会話履歴
+let history = []; // 過去の分析セッションの履歴 [{label, time}]
+let currentSessionStarted = false; // 今の会話をすでに履歴に記録したか
+
+function loadHistory(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('aiJohnnyHistory') || '[]');
+    if(Array.isArray(saved)) history = saved;
+  } catch(e){ history = []; }
+}
+function saveHistory(){
+  localStorage.setItem('aiJohnnyHistory', JSON.stringify(history.slice(0, 30)));
+}
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  if(history.length === 0){
+    list.innerHTML = '<div class="history-empty">まだ履歴はありません。<br>分析すると、ここに<br>記録されます。</div>';
+    return;
+  }
+  list.innerHTML = history.map(h =>
+    `<div class="history-item"><span class="hi-label">${escapeHtml(h.label)}</span><span class="hi-time">${escapeHtml(h.time)}</span></div>`
+  ).join('');
+}
+function addHistoryEntry(label){
+  const time = new Date().toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  history.unshift({ label: label.slice(0, 40) || '（分析リクエスト）', time });
+  saveHistory();
+  renderHistory();
+}
 
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('collapsed');
@@ -387,6 +420,10 @@ async function sendToJohnny(userContent, userDisplayText){
       conversation.push({ role: 'assistant', content: [{ type: 'text', text: data.result }] });
       resultBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(data.result)}</div>`;
       document.getElementById('chatInputRow').style.display = 'flex';
+      if(!currentSessionStarted){
+        currentSessionStarted = true;
+        addHistoryEntry(userDisplayText);
+      }
     }
     log.appendChild(resultBubble);
     resultBubble.scrollIntoView({behavior:'smooth', block:'start'});
@@ -460,11 +497,15 @@ document.getElementById('chatInput').addEventListener('keydown', (e) => {
 function resetChat(){
   uploadedFiles = [];
   conversation = [];
+  currentSessionStarted = false;
   document.getElementById('textNote').value = '';
   document.getElementById('fileList').innerHTML = '';
   document.getElementById('chatLog').innerHTML = '';
   updateAnalyzeBtn();
 }
+
+loadHistory();
+renderHistory();
 </script>
 </body>
 </html>
