@@ -137,7 +137,17 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .loading{text-align:center;color:var(--muted);font-size:13px;padding:60px 20px}
 
 @media(max-width:600px){
-  .sidebar{position:fixed;left:0;top:57px;bottom:0;z-index:50;box-shadow:2px 0 12px rgba(0,0,0,.4)}
+  .sidebar{position:fixed;left:0;top:57px;bottom:0;z-index:80;box-shadow:2px 0 12px rgba(0,0,0,.4);
+    width:min(78vw,280px);margin-left:0;transition:transform .2s}
+  .sidebar.collapsed{margin-left:0;transform:translateX(-100%)}
+  .sidebar-backdrop{display:none;position:fixed;inset:0;top:57px;background:rgba(0,0,0,.5);z-index:70}
+  .sidebar-backdrop.show{display:block}
+  .hamburger{flex-shrink:0}
+  .titles{min-width:0;overflow:hidden}
+  .t-title{overflow:hidden;text-overflow:ellipsis}
+  .t-sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .new-chat-btn{flex-shrink:0;font-size:10px;padding:6px 8px}
+  .portal-back{flex-shrink:0}
 }
 </style>
 </head>
@@ -156,6 +166,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   </div>
 
   <div class="layout">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
     <div class="sidebar" id="sidebar">
       <div class="sidebar-label">分析履歴</div>
       <input type="text" class="history-search" id="historySearch" placeholder="🔍 履歴を検索..." oninput="renderHistory()">
@@ -272,6 +283,7 @@ function loadHistoryEntry(idx){
 
   if(window.innerWidth <= 600){
     document.getElementById('sidebar').classList.add('collapsed');
+    document.getElementById('sidebarBackdrop').classList.remove('show');
   }
 }
 function addHistoryEntry(label){
@@ -322,7 +334,12 @@ function exportHistoryEntry(idx){
 }
 
 function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('collapsed');
+  const collapsed = document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('sidebarBackdrop').classList.toggle('show', !collapsed);
+}
+// スマホ幅では初期状態でサイドバーを閉じ、メイン画面を隠さないようにする
+if(window.innerWidth <= 600){
+  document.getElementById('sidebar').classList.add('collapsed');
 }
 
 const dropzone = document.getElementById('dropzone');
@@ -394,12 +411,38 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// 画像が大きすぎるとリクエストサイズ超過エラーやOCR精度低下の原因になるため、
+// 長辺を最大1568px（Claudeの画像解析に十分な解像度）にリサイズしてからBase64化する
 function fileToBase64(file){
+  const MAX_EDGE = 1568;
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if(width > MAX_EDGE || height > MAX_EDGE){
+        const scale = MAX_EDGE / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      resolve({ mediaType: 'image/jpeg', data: dataUrl.split(',')[1] });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      // 画像として読み込めない場合は元データのままBase64化してフォールバック
+      const reader = new FileReader();
+      reader.onload = () => resolve({ mediaType: file.type, data: reader.result.split(',')[1] });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    };
+    img.src = url;
   });
 }
 
@@ -426,9 +469,16 @@ function extractVideoFrames(file, frameCount = 3){
         video.currentTime = times[idx];
       };
       video.onseeked = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0);
+        const MAX_EDGE = 1568;
+        let w = video.videoWidth, h = video.videoHeight;
+        if(w > MAX_EDGE || h > MAX_EDGE){
+          const scale = MAX_EDGE / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
         frames.push(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
         idx++;
         captureNext();
@@ -557,7 +607,8 @@ async function runAnalysis(){
     const images = [];
     for(const f of uploadedFiles){
       if(f.type.startsWith('image/')){
-        images.push({ media_type: f.type, data: await fileToBase64(f) });
+        const { mediaType, data } = await fileToBase64(f);
+        images.push({ media_type: mediaType, data });
       } else if(f.type.startsWith('video/')){
         const frames = await extractVideoFrames(f, 3);
         frames.forEach(data => images.push({ media_type: 'image/jpeg', data }));
