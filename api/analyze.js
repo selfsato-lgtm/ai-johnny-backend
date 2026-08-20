@@ -1,4 +1,5 @@
 const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE } = require('./knowledge');
+const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 
 function buildSystemPrompt() {
   const baseText = Object.entries(BASE)
@@ -73,7 +74,14 @@ ${guideText}
 個人を傷つけたり不快にさせたりする表現は避けること。
 
 なお、最初の診断のあとにユーザーから追加の質問が来た場合は、上記の4セクション構成に縛られず、
-その質問に自然な会話文（Markdown可）で答えてよい。診断結果を踏まえた具体的なアドバイスを続けること。`;
+その質問に自然な会話文（Markdown可）で答えてよい。診断結果を踏まえた具体的なアドバイスを続けること。
+
+【デートログ（冒険の書）を踏まえたレストラン・デートプラン提案について】
+ユーザーが「冒険の書」のエクスポート文（Markdown末尾に\`\`\`json ブロックを含む）を貼り付けた場合、
+そこから相手ごとの過去のデート履歴（利用した店・きっかけ・デート回数）を読み取れることがある。
+その情報がシステムプロンプト内に「【デートログに基づく重複回避情報】」として渡された場合は、
+レストランやデートプランを提案する際に、その相手について過去に利用した店・きっかけと
+同じ提案を繰り返さないよう考慮すること（何回目のデートかも踏まえ、関係性の深まりに合った提案を意識する）。`;
 }
 
 const SYSTEM_PROMPT = buildSystemPrompt();
@@ -124,6 +132,25 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // ユーザー発言に「冒険の書」エクスポート文が貼られていれば、
+    // デートログの重複回避情報をこのリクエスト限定でシステムプロンプトに追加する
+    const userText = messages
+      .filter((m) => m && m.role === 'user')
+      .map((m) => {
+        if (typeof m.content === 'string') return m.content;
+        if (Array.isArray(m.content)) {
+          return m.content
+            .filter((b) => b && b.type === 'text' && typeof b.text === 'string')
+            .map((b) => b.text)
+            .join('\n');
+        }
+        return '';
+      })
+      .join('\n');
+    const dateLogs = extractDateLogsFromText(userText);
+    const avoidanceNote = buildDateLogAvoidanceNote(dateLogs);
+    const systemForRequest = avoidanceNote ? `${SYSTEM_PROMPT}\n\n${avoidanceNote}` : SYSTEM_PROMPT;
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -134,7 +161,7 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 1500,
-        system: SYSTEM_PROMPT,
+        system: systemForRequest,
         messages,
       }),
     });
