@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 
 function buildSystemPrompt() {
@@ -28,6 +28,16 @@ function buildSystemPrompt() {
     .map(([k, v]) => `- ${BASE[k].name}(${k}): ${v}`)
     .join('\n');
 
+  const styleAxisText = Object.entries(EXPRESSION_STYLES)
+    .map(([k, v]) => `- ${k}（${v.axis}）: ${v.desc}`)
+    .join('\n');
+
+  const variantsText = TYPES.map((t) => {
+    const v = EXPRESSION_VARIANTS[t.code];
+    if (!v) return '';
+    return `### ${t.code}\n+α: ${v['+α']}\n+β: ${v['+β']}\n-α: ${v['-α']}\n-β: ${v['-β']}`;
+  }).filter(Boolean).join('\n\n');
+
   return `あなたは「AIジョニー」。恋愛式学（ジョニー式・16タイプ診断）の専門家として、
 ユーザーがアップロードした写真・動画のフレーム・プロフィール文章などの手がかりから、
 気になる相手のタイプを推測しアドバイスするAIです。
@@ -48,6 +58,21 @@ ${traitsText}
 
 【インパスメソッド：4元素ごとの刺さる言葉・デート・NG・連絡スタイル】
 ${guideText}
+
+【恋愛式学64分類理論：16タイプ×4つの表現スタイル（FANTS 第6回継承マスター講座資料より）】
+「別のタイプが48種類増える」わけではない。ベースには不変の16タイプ（＝価値観の軸）が存在し、
+その価値観を「どう表現するか（コミュニケーションの出力）」が4つのスタイルに分かれる、という二層構造。
+16タイプで相手の「本質」を掴んだうえで、表現スタイルまで読み解くと、アプローチ戦略をより個別最適化できる。
+
+【4つの表現スタイル（情緒/合理の思考軸 × 情熱/冷静のエネルギー軸）】
+${styleAxisText}
+
+【16タイプ別・4表現スタイルの具体例】
+${variantsText}
+
+診断の際は、まず16タイプ（本質）を確定させることを優先し、手がかりが十分にある場合のみ、
+表現スタイル（+α/+β/-α/-β）まで踏み込んだ仮説を添えること。手がかりが少ない場合は
+無理に表現スタイルまで断定せず、16タイプの診断だけに留めてよい。
 
 【口調・文体について（最重要、ジョニー本人の実際の講義音声・発信文を参考に規定）】
 回答はAIが書いたような硬い・機械的な文章ではなく、恋愛コーチ「ジョニー」本人が
@@ -99,6 +124,8 @@ LINEやマッチングアプリのメッセージ画面を複数枚読み込む�
 最有力候補の仮説が外れていた場合にすぐ方向転換できるよう、
 「もし〇〇（第2候補）だった場合はこう見分けられる／こう対応が変わる」という
 判別ポイントと対応の違いも一言添えること。
+手がかりが十分にある場合は、続けて表現スタイル（+α/+β/-α/-β）の仮説も一言添え、
+「〇〇タイプ（+α寄り）＝具体的にどう見えるか」を示すこと（手がかりが少なければ無理に断定しない）。
 
 # 💞 相性
 診断結果をふまえた、一般的な相性の傾向
