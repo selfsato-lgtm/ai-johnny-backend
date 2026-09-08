@@ -1,5 +1,13 @@
 const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
+const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
+const { isActiveMember } = require('../lib/membership');
+
+function getCookie(req, name) {
+  const raw = req.headers.cookie || '';
+  const match = raw.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 function buildSystemPrompt() {
   const baseText = Object.entries(BASE)
@@ -179,6 +187,15 @@ module.exports = async (req, res) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     res.status(500).json({ error: 'サーバー側にAPIキーが設定されていません' });
+    return;
+  }
+
+  // 会員限定チェック(ページのmiddlewareを経由しない直接APIコールを防ぐ多重防御)
+  const sessionSecret = process.env.SESSION_SECRET;
+  const token = getCookie(req, SESSION_COOKIE_NAME);
+  const payload = sessionSecret ? await verifySessionToken(token, sessionSecret) : null;
+  if (!payload || !payload.email || !(await isActiveMember(payload.email))) {
+    res.status(401).json({ error: 'ログインが必要です（会員限定機能です）' });
     return;
   }
 

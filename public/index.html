@@ -171,6 +171,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
       <div class="t-sub"><span class="dot"></span>写真・動画・テキストからタイプを分析</div>
     </div>
     <button class="new-chat-btn" onclick="resetChat()">＋ 新規分析</button>
+    <div id="accountBar" style="font-size:11px;color:#aab;margin-left:10px;display:flex;align-items:center;gap:6px;white-space:nowrap"></div>
   </div>
 
   <div class="layout">
@@ -686,6 +687,18 @@ function resetChat(){
 
 loadHistory();
 renderHistory();
+
+// ログイン中のメールアドレス表示とログアウトリンク(ページ本体はmiddlewareで既にログイン+会員限定済み)
+(async () => {
+  try {
+    const res = await fetch('/api/auth/me');
+    const data = await res.json();
+    if(data.loggedIn){
+      document.getElementById('accountBar').innerHTML =
+        `<span>${escapeHtml(data.email)}</span><a href="/api/auth/logout" style="color:var(--muted)">ログアウト</a>`;
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
