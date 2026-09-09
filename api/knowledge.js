@@ -245,4 +245,14 @@ const DATE_PSYCHOLOGY = [
   { name: 'ザイオンス効果（単純接触効果）', point: '1回を長く濃密にするより、短くても会う回数を増やす方が安心感・好意が育ちやすい。' },
 ];
 
-module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY };
+// 短期決戦の逆算デート戦略（FANTS「クリスマス商戦期！恋愛成就メソッド逆算デート術」より）
+// クリスマスに限らず「期限のある短期決戦」全般の相談で使える考え方
+const SHORT_TERM_STRATEGY = {
+  timing: '目標の日（クリスマス等のイベント）の1ヶ月前が動き出しの目安。直前に動くのでは遅く、「1ヶ月前の行動が当日の出会い・関係の深さを生む」という逆算思考で今すぐ動くよう促す。',
+  meetingSources: '出会いの場は1つに絞らず複数を掛け合わせる（例: マッチングアプリ／街コン／婚活パーティー／合コン／相席屋／結婚相談所／知人紹介／ナンパ（ストリート・店内）／コミュニティ・職場など）。短期決戦ほどアプローチの母数を増やすことが重要。',
+  dateFrequency: '「週1回の長時間デート」より「週2回の短時間デート」の方が、単純接触効果（ザイオンス効果）も働き関係が深まりやすい。',
+  parallelApproach: '「一本釣り」ではなく「網漁」。1人に懸けて盤石になるまで待つのではなく、同時に複数人とやり取りを進める方が、機会損失も精神的な依存も避けやすい。',
+  conversationFlow: '初回デートの会話は「仕事や共通点→休日の過ごし方→趣味→エピソード（成長期・初恋など）→恋愛観→2回目の約束」の順で深掘りしていく。最初は5W1H（いつ/どこで/誰と/何を/どのように）で情報を集め、後半で「なぜ？」「どんな感情だった？」と感情を深掘りする。質問を1つずつ完結させて次へ移り、尋問のように領域を次々変えすぎないこと（エピソードのつながりを意識する）。',
+};
+
+module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY };

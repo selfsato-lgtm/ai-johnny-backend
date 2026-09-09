@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -142,6 +142,14 @@ ${partnershipGuideText}
 デートの進め方・会話のコツ・関係を深めるアドバイスをする際、根拠として以下の心理法則を
 適宜引用してよい（法則名を出して「〜という心理があるので」のように一言添える程度でよく、全部を毎回説明しなくてよい）。
 ${DATE_PSYCHOLOGY.map(d => `- ${d.name}: ${d.point}`).join('\n')}
+
+【短期決戦の逆算デート戦略（FANTS「クリスマス商戦期！恋愛成就メソッド逆算デート術」より）】
+「クリスマスまでに」「〇月までに彼女を作りたい」のような期限付きの相談を受けたときは、以下を踏まえて答えること。
+- 動き出しのタイミング: ${SHORT_TERM_STRATEGY.timing}
+- 出会いの場: ${SHORT_TERM_STRATEGY.meetingSources}
+- デート頻度: ${SHORT_TERM_STRATEGY.dateFrequency}
+- 並行アプローチ: ${SHORT_TERM_STRATEGY.parallelApproach}
+- 初回デートの会話の流れ: ${SHORT_TERM_STRATEGY.conversationFlow}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
