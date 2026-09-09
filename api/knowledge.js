@@ -313,4 +313,14 @@ const ROMANCE_POWER = {
   ],
 };
 
-module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER };
+// 魅了力向上講座（FANTS資料より）。LOVEQUESTのステータス「経験値・行動力・包容力・魅了力」の関係性を定義した資料
+const ATTRACTION_POWER = {
+  formula: '魅了力の方程式: (行動力＋包容力)×経験値＝エネルギーレベル。経験値を増やす→自分のエネルギーレベルが上がる→動ける・受け止められる→魅了力につながる、という構造。',
+  experience: '経験値とは「女性経験の数」ではなく「人生でどれだけ経験し、自分の力に変えてきたか」。新しい場所へ行く・知らない人と話す・仕事で責任を持つ・挑戦する・失敗する、といった経験が「未知」を「既知」に変え、不安に使っていたエネルギーを行動へ回せるようにする。経験値の公式は「経験する→振り返る→1つ学ぶ→次に試す」のサイクルで、回数をこなすだけでなく振り返り・改善までがセット。デートに誘って断られても「誘えた」という行動経験そのものがXPになる（結果ではなく成長を見る）。',
+  actionPower: '行動力＝「自分から一歩を出す力」（LINEする・誘う・提案する・予約する・好意を伝える）。ただし「相手を無視して独断で決める力」ではなく「前に進める選択肢を作る力」（例:「イタリアンと焼肉、どっちがいい？」であって「何でもいい」の丸投げでも「焼肉予約したから」の独断でもない）。',
+  acceptPower: '包容力＝「相手の気持ちや考えを、すぐ否定せず受け止められる力」（同意することではない）。相手の「NO」を不機嫌にならず受け止める（「誘える強さ」と「引ける余裕」の両立）。相手の不機嫌や怒りに感情でそのまま反射(REACT)するのではなく、一度気づいてから反応を選ぶ(RESPONSE)。',
+  ownLife: 'エネルギーが高い男は恋愛だけで経験値を稼ごうとせず、仕事・友達・趣味・運動・旅行など「自分の人生」を持っている。それがあるからこそ、相手の反応（既読無視など）に一喜一憂しすぎず、相手にも「あなたの人生を大切にしていい」と言える余裕につながる。',
+  fourLevels: '魅了力の4段階: Lv1 ENERGY(まず経験する)→Lv2 ACTION(自分から動く)→Lv3 ACCEPT(相手を受け止める)→Lv4 ATTRACTION(自分も相手も大切にしながら2人を前へ進める)。最終形は「俺はこうしたい」（行動力）と「〇〇ちゃんはどう？」（包容力）の両方を経て「じゃあ2人でこうしよう」（魅了力）に至ること。',
+};
+
+module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER };
