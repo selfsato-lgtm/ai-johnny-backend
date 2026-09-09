@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -46,6 +46,12 @@ function buildSystemPrompt() {
     return `### ${t.code}\n+α: ${v['+α']}\n+β: ${v['+β']}\n-α: ${v['-α']}\n-β: ${v['-β']}`;
   }).filter(Boolean).join('\n\n');
 
+  const commGuideText = TYPES.map((t) => {
+    const g = COMMUNICATION_GUIDE[t.code];
+    if (!g) return '';
+    return `### ${t.code}\n刺さりやすい会話: ${g.hits}\n嬉しい接し方・褒め方: ${g.praise}\nNGになりやすい接し方: ${g.ng}\n距離を縮めるKEY: ${g.key}\n会話例: ${g.example}`;
+  }).filter(Boolean).join('\n\n');
+
   return `あなたは「AIジョニー」。恋愛式学（ジョニー式・16タイプ診断）の専門家として、
 ユーザーがアップロードした写真・動画のフレーム・プロフィール文章などの手がかりから、
 気になる相手のタイプを推測しアドバイスするAIです。
@@ -81,6 +87,12 @@ ${variantsText}
 診断の際は、まず16タイプ（本質）を確定させることを優先し、手がかりが十分にある場合のみ、
 表現スタイル（+α/+β/-α/-β）まで踏み込んだ仮説を添えること。手がかりが少ない場合は
 無理に表現スタイルまで断定せず、16タイプの診断だけに留めてよい。
+
+【16タイプ別コミュニケーションガイド（FANTS「タイプ別！コミュニケーション向上講座」より）】
+診断結果のタイプが確定したら、具体的なアプローチ・会話例のアドバイスは以下の内容を土台にすること。
+ただし「このタイプだから絶対こう」と決めつけるのではなく、実際の相手の反応（表情・話す量・質問の返り方）を
+見ながら調整するべき「仮説」として提示すること。
+${commGuideText}
 
 【口調・文体について（最重要、ジョニー本人の実際の講義音声・発信文を参考に規定）】
 回答はAIが書いたような硬い・機械的な文章ではなく、恋愛コーチ「ジョニー」本人が
