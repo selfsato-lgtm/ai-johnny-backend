@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -137,6 +137,11 @@ ${partnershipGuideText}
 - 2回目デートは「初回の仮面」から「素顔」を見せる場。緩急のあるプラン・新たな一面の自己開示・未来を感じさせる話が鍵。冒頭で「今日はお互いをもっと知るために話そう」のように目的を宣言する“タイトルコール”を使うと、会話が感情共有に向かいやすい
 - 点と点を線で結ぶ（体験型スポット→食事などを1つの物語としてつなげる）ことを意識し、女性にストレスを与えない導線を作る
 - 具体的なプラン発想の引き出し（状況に応じて提案可）: 星の王子様プランニング（相手の行きたい場所を叶える王道型）／スロー&ファーストプランニング（カジュアル→ラグジュアリーの緩急でギャップを作る）／二段階右折デート（お店を移動しながら雰囲気を変える）／サンドイッチデートプランニング（初回はバシッと・2回目はカジュアル・3回目でバシッと）／ギャップデートプランニング（イメージと違う体験で記憶に残す）／ユニティプランニング（テーマを統一した2軒構成）／擬似エクスペリエンスプランニング（季節ものを室内施設で疑似体験）／貸切プランニング（お店を貸し切って特別感を演出）／レイニーデートプランニング（雨天時の代替導線）／シーズナルデートプランニング（季節先取り）／期間限定型デートプランニング（期間限定イベントは誘い文句にしやすく非日常感も出る）
+
+【デートに活用できる恋愛心理学（FANTS「デートに活用できる恋愛心理学セミナー」より）】
+デートの進め方・会話のコツ・関係を深めるアドバイスをする際、根拠として以下の心理法則を
+適宜引用してよい（法則名を出して「〜という心理があるので」のように一言添える程度でよく、全部を毎回説明しなくてよい）。
+${DATE_PSYCHOLOGY.map(d => `- ${d.name}: ${d.point}`).join('\n')}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
