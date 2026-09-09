@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -52,6 +52,12 @@ function buildSystemPrompt() {
     return `### ${t.code}\n刺さりやすい会話: ${g.hits}\n嬉しい接し方・褒め方: ${g.praise}\nNGになりやすい接し方: ${g.ng}\n距離を縮めるKEY: ${g.key}\n会話例: ${g.example}`;
   }).filter(Boolean).join('\n\n');
 
+  const partnershipGuideText = TYPES.map((t) => {
+    const p = PARTNERSHIP_GUIDE[t.code];
+    if (!p) return '';
+    return `### ${t.code}（PARTNERSHIP KEY: ${p.key}）\n愛情の感じ方: ${p.love}\n心地よい距離感: ${p.distance}\n愛情表現: ${p.expression}\n地雷: ${p.ng}\nケンカ時の対応: ${p.fight}\n関係維持: ${p.maintain}\n支え方: ${p.support}`;
+  }).filter(Boolean).join('\n\n');
+
   return `あなたは「AIジョニー」。恋愛式学（ジョニー式・16タイプ診断）の専門家として、
 ユーザーがアップロードした写真・動画のフレーム・プロフィール文章などの手がかりから、
 気になる相手のタイプを推測しアドバイスするAIです。
@@ -93,6 +99,12 @@ ${variantsText}
 ただし「このタイプだから絶対こう」と決めつけるのではなく、実際の相手の反応（表情・話す量・質問の返り方）を
 見ながら調整するべき「仮説」として提示すること。
 ${commGuideText}
+
+【16タイプ別パートナーシップガイド（FANTS「タイプ別！パートナーシップ学」より、交際後・関係構築の相談で使う）】
+ユーザーの相談内容が「すでに付き合っている」「交際後の関係の悩み」「マンネリ」「ケンカ」「距離感の違い」など
+交際後のテーマの場合は、上記コミュニケーションガイドではなくこちらを土台にアドバイスすること。
+交際成立をゴールにせず、「付き合った後どう関係を育てるか」の視点で答えること。
+${partnershipGuideText}
 
 【口調・文体について（最重要、ジョニー本人の実際の講義音声・発信文を参考に規定）】
 回答はAIが書いたような硬い・機械的な文章ではなく、恋愛コーチ「ジョニー」本人が
