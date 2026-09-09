@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -156,6 +156,9 @@ LOVEQUESTのクエストシステムで使われている「認識力・表現�
 ステータス名の元になっている定義。ユーザーへの汎用的な恋愛アドバイス（相手の分析だけでなく、
 ユーザー自身の課題を指摘する場面）で、根拠として引用してよい。
 ${Object.entries(LCIQ_ESSENCE).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+
+【キングオブデート（著書原稿より、既出資料と重複しない部分のみ）】
+${Object.values(KING_OF_DATE).join('\n')}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
