@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -159,6 +159,12 @@ ${Object.entries(LCIQ_ESSENCE).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
 
 【キングオブデート（著書原稿より、既出資料と重複しない部分のみ）】
 ${Object.values(KING_OF_DATE).join('\n')}
+
+【ロマンス力（ジョニー本人の哲学とサプライズ演出の引き出し）】
+${ROMANCE_POWER.philosophy}
+記念日・プロポーズ・特別なサプライズの相談を受けたときは、以下のアイデアの方向性を参考に、
+ユーザーの状況（予算・relationshipの深さ・相手のタイプ）に合わせてアレンジして提案してよい（丸ごと再現を強制する必要はない）。
+${ROMANCE_POWER.surpriseIdeas.map(s => `- ${s}`).join('\n')}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
