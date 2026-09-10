@@ -88,11 +88,15 @@ export default async function middleware(request) {
   const token = getCookie(request, 'lqm_session');
   const payload = sessionSecret ? await verifySessionToken(token, sessionSecret) : null;
 
-  if (!payload || !payload.email) {
+  if (!payload || (!payload.email && !payload.guest)) {
     const loginUrl = new URL('/api/auth/start', url.origin);
     loginUrl.searchParams.set('next', url.pathname);
     return Response.redirect(loginUrl, 302);
   }
+
+  // ゲストトークンは会員リストに存在しないので、会員チェックはスキップする。
+  // トークン自体に24時間の有効期限(exp)が埋め込まれており、verifySessionTokenで既に検証済み。
+  if (payload.guest) return undefined;
 
   const active = await isActiveMember(payload.email);
   if (!active) {

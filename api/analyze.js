@@ -267,7 +267,8 @@ module.exports = async (req, res) => {
   const sessionSecret = process.env.SESSION_SECRET;
   const token = getCookie(req, SESSION_COOKIE_NAME);
   const payload = sessionSecret ? await verifySessionToken(token, sessionSecret) : null;
-  if (!payload || !payload.email || !(await isActiveMember(payload.email))) {
+  const isGuest = payload && payload.guest && typeof payload.exp === 'number';
+  if (!payload || (!isGuest && (!payload.email || !(await isActiveMember(payload.email))))) {
     res.status(401).json({ error: 'ログインが必要です（会員限定機能です）' });
     return;
   }
