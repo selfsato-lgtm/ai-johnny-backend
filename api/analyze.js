@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -175,6 +175,21 @@ LOVEQUESTのステータス「経験値・行動力・包容力・魅了力」�
 - 包容力: ${ATTRACTION_POWER.acceptPower}
 - 自分の人生を持つこと: ${ATTRACTION_POWER.ownLife}
 - 4段階: ${ATTRACTION_POWER.fourLevels}
+
+【マッチングアプリ完全解説マニュアル（FANTS資料より、キングオブデートと重複しない実務ルールのみ）】
+アプリ選び・運用・メッセージ・誘い方について具体的なやり方を聞かれたときに使う。
+- 立ち位置の把握: ${MATCHING_APP_GUIDE.mindset}
+- アプリの選び方: ${MATCHING_APP_GUIDE.appSelection}
+- プロフィールの見られ方: ${MATCHING_APP_GUIDE.profileFirstSeenOrder}
+- 自己紹介文テンプレ: ${MATCHING_APP_GUIDE.selfIntroTemplate}
+- あしあと戦略: ${MATCHING_APP_GUIDE.ashiatoStrategy}
+- 稼働維持のルール: ${MATCHING_APP_GUIDE.keepActiveRules}
+- ログイン周期: ${MATCHING_APP_GUIDE.loginCycle}
+- メッセージの心構え: ${MATCHING_APP_GUIDE.messageMindset}
+- 挨拶メッセージの黄金公式: ${MATCHING_APP_GUIDE.greetingFormula}
+- デートへの誘い方（だったら戦略）: ${MATCHING_APP_GUIDE.strategicInvite}
+- 確率の目安: ${MATCHING_APP_GUIDE.conversionRates}
+- 複数人と並行する際のデート予算配分: ${MATCHING_APP_GUIDE.dateBudget}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
