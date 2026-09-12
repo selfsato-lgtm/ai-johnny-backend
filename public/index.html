@@ -528,6 +528,10 @@ function renderResultText(text){
       flushList();
       return;
     }
+    // AIの返答に紛れ込む「、」「・」単体だけの行（区切りのつもりと思われる記号のみの行）は無視する
+    if(/^[、。・\s]+$/.test(line)){
+      return;
+    }
     if(/^-{3,}$/.test(line)){
       flushList();
       html += '<div style="border-top:1px solid #2a2a4a;margin:12px 0"></div>';
