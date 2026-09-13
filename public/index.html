@@ -109,7 +109,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .chat-input-row{display:flex;gap:8px;margin-top:16px;position:sticky;bottom:0;
   background:var(--bg);padding:10px 0}
 .chat-input{flex:1;background:var(--card2);border:1px solid #2a2a4a;border-radius:20px;
-  padding:10px 16px;font-size:13px;color:var(--light);font-family:inherit}
+  padding:10px 16px;font-size:13px;color:var(--light);font-family:inherit;
+  resize:none;max-height:140px;overflow-y:auto;line-height:1.4}
 .chat-input::placeholder{color:var(--muted)}
 .chat-input:focus{outline:none;border-color:var(--gold)}
 .chat-send-btn{flex-shrink:0;font-size:13px;padding:10px 18px;border-radius:20px;
@@ -208,7 +209,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
         <div class="chat-log" id="chatLog"></div>
 
         <div class="chat-input-row" id="chatInputRow">
-          <input type="text" class="chat-input" id="chatInput" placeholder="AIジョニーに質問する（写真がなくてもOK）...">
+          <textarea class="chat-input" id="chatInput" rows="1" placeholder="AIジョニーに質問する（写真がなくてもOK）..."></textarea>
           <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">送信</button>
         </div>
       </div>
@@ -692,18 +693,20 @@ async function sendChatMessage(){
   const sendBtn = document.getElementById('chatSendBtn');
   sendBtn.disabled = true;
   input.value = '';
+  autoGrowChatInput(); // 送信後は高さを1行分に戻す
 
   await sendToJohnny([{ type: 'text', text }], text);
 
   sendBtn.disabled = false;
   input.focus();
 }
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' && !e.isComposing){
-    e.preventDefault();
-    sendChatMessage();
-  }
-});
+// 投稿はボタンでのみ行う。Enterキーは（IME変換中かどうかに関わらず）常に改行として機能させる
+function autoGrowChatInput(){
+  const el = document.getElementById('chatInput');
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+document.getElementById('chatInput').addEventListener('input', autoGrowChatInput);
 
 function resetChat(){
   uploadedFiles = [];
