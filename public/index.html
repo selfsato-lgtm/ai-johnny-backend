@@ -228,8 +228,34 @@ function loadHistory(){
     if(Array.isArray(saved)) history = saved;
   } catch(e){ history = []; }
 }
+// 画像のbase64データ(数百KB〜数MB)を丸ごとlocalStorageに保存すると、履歴が増えるにつれて
+// 容量上限(QuotaExceededError)に達しやすい。履歴の再表示では画像そのものは使わず
+// 「📎 画像あり」の表示に使うのみなので、保存時はbase64データを空にして軽量化する。
+function stripImagesForStorage(messages){
+  return (messages || []).map(m => ({
+    ...m,
+    content: Array.isArray(m.content)
+      ? m.content.map(c => (c && c.type === 'image')
+          ? { type: 'image', source: { type: 'base64', media_type: c.source?.media_type, data: '' } }
+          : c)
+      : m.content,
+  }));
+}
 function saveHistory(){
-  localStorage.setItem('aiJohnnyHistory', JSON.stringify(history.slice(0, 30)));
+  const lightHistory = history.slice(0, 30).map(h => ({ ...h, messages: stripImagesForStorage(h.messages) }));
+  try {
+    localStorage.setItem('aiJohnnyHistory', JSON.stringify(lightHistory));
+  } catch(e){
+    // 画像を除いてもなお容量オーバーする場合は、古い履歴から間引いて再試行する
+    for(let keep = 15; keep >= 1; keep -= 5){
+      try {
+        localStorage.setItem('aiJohnnyHistory', JSON.stringify(lightHistory.slice(0, keep)));
+        return;
+      } catch(e2) { /* さらに間引いて再試行 */ }
+    }
+    // それでも失敗する場合は履歴保存を諦める（分析結果の表示自体は継続させる）
+    console.warn('履歴の保存に失敗しました（ストレージ容量超過）:', e);
+  }
 }
 function renderHistory(){
   const list = document.getElementById('historyList');
@@ -598,6 +624,12 @@ async function sendToJohnny(userContent, userDisplayText){
         : '';
       resultBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(data.result)}${truncatedNotice}</div>`;
       document.getElementById('chatInputRow').style.display = 'flex';
+    }
+    // 履歴の保存(ローカルストレージ)より先に回答を表示する。
+    // 保存側で例外が起きても、既にAIから返ってきた回答の表示は失われないようにするため
+    log.appendChild(resultBubble);
+    resultBubble.scrollIntoView({behavior:'smooth', block:'start'});
+    if(res.ok && !data.error){
       if(!currentSessionStarted){
         currentSessionStarted = true;
         addHistoryEntry(userDisplayText);
@@ -605,8 +637,6 @@ async function sendToJohnny(userContent, userDisplayText){
         saveHistory(); // 追質問のやり取りも同じ履歴エントリに反映させる
       }
     }
-    log.appendChild(resultBubble);
-    resultBubble.scrollIntoView({behavior:'smooth', block:'start'});
   } catch (err) {
     conversation.pop();
     typingBubble.remove();
