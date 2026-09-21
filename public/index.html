@@ -547,6 +547,19 @@ function renderInline(s){
   out = out.replace(/`(.+?)`/g, '<code>$1</code>');
   // Web検索の参考リンク等、[表示名](URL)形式のMarkdownリンクをクリック可能にする
   out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // AIが「参考: https://...」のように素のURLをそのまま書く場合もあるため、
+  // 既にリンク化された<a>タグ部分を避けつつ、残った素のURLもクリック可能にする
+  // （括弧・句読点はURLの一部として拾わないよう文字クラスから除外しておく）
+  out = out.split(/(<a\b[^>]*>.*?<\/a>)/g).map(part => {
+    if(part.startsWith('<a')) return part;
+    return part.replace(/https?:\/\/[^\s<>「」『』（）()、。,]+/g, (m) => {
+      const trailing = m.match(/[.,;:!?]+$/);
+      const url = trailing ? m.slice(0, m.length - trailing[0].length) : m;
+      const tail = trailing ? trailing[0] : '';
+      if(!url) return m;
+      return `<a href="${url}" target="_blank" rel="noopener">${url}</a>${tail}`;
+    });
+  }).join('');
   return out;
 }
 
