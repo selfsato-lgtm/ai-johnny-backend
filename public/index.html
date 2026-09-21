@@ -133,6 +133,9 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .truncated-notice{margin-top:12px;padding:10px 12px;border:1px solid var(--gold);border-radius:10px;
   background:rgba(245,166,35,.08);font-size:11.5px;color:var(--light);display:flex;
   align-items:center;flex-wrap:wrap;gap:8px}
+.msg-copy-btn{display:block;margin-top:10px;font-size:11px;padding:5px 12px;border-radius:14px;
+  border:1px solid #2a2a4a;background:var(--card2);color:var(--muted);cursor:pointer}
+.msg-copy-btn:hover{border-color:var(--gold);color:var(--gold)}
 .truncated-btn{flex-shrink:0;background:var(--gold);color:#1a1a2e;border:none;border-radius:16px;
   padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer}
 .truncated-btn:hover{opacity:.85}
@@ -311,6 +314,7 @@ function loadHistoryEntry(idx){
       const div = document.createElement('div');
       div.className = 'bubble';
       div.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(texts)}</div>`;
+      addCopyButton(div, texts);
       log.appendChild(div);
     }
   });
@@ -541,6 +545,24 @@ function extractVideoFrames(file, frameCount = 3){
 }
 
 // **bold** や `code` などインラインのMarkdown記法をHTMLに変換
+// AIの回答バブルに「コピー」ボタンを追加する（rawTextはMarkdown記法込みの生テキスト）
+function addCopyButton(bubbleEl, rawText){
+  const body = bubbleEl.querySelector('.b-body');
+  if(!body || !rawText) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'msg-copy-btn';
+  btn.textContent = '📋 コピー';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(rawText).then(() => {
+      btn.textContent = '✅ コピーしました';
+      setTimeout(() => { btn.textContent = '📋 コピー'; }, 1500);
+    }, () => {
+      window.prompt('コピーできませんでした。以下を選択してコピーしてください', rawText);
+    });
+  };
+  body.appendChild(btn);
+}
 function renderInline(s){
   let out = escapeHtml(s);
   out = out.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -652,6 +674,7 @@ async function sendToJohnny(userContent, userDisplayText){
            <button type="button" class="truncated-btn" onclick="sendToJohnny([{type:'text',text:'続けて'}], '続けて')">続きを見る →</button></div>`
         : '';
       resultBubble.innerHTML = `<div class="b-avatar">🧠</div><div class="b-body">${renderResultText(data.result)}${truncatedNotice}</div>`;
+      addCopyButton(resultBubble, data.result);
       document.getElementById('chatInputRow').style.display = 'flex';
     }
     // 履歴の保存(ローカルストレージ)より先に回答を表示する。
