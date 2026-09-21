@@ -363,4 +363,13 @@ const JOHNNY_COLUMNS = {
   '恋愛の賞味期限と恋と愛の関係性': '「恋」は相手の長所に惹かれる一方通行の感情で、自分磨きの原動力になるが、体で反応するもの・マイ憲法（価値観）同士がぶつかり合うものであり、必ず賞味期限がある。「愛」は相手の短所も含めて受け入れることで、心で引き寄せ合い、相手のために自分を磨き、二人の憲法（価値観）を新たに作り上げていく、恋よりもはるかに深い状態。「恋は知性がなくても誰でも経験できるが、愛は知性がなければ経験できない」。だからこそ恋のドキドキ（賞味期限）が終わった時に訪れるのは「別れ」か「愛への移行」のどちらかであり、これは自然な原理原則として伝える（交際が落ち着いてきた・マンネリを感じる、という相談への回答の軸に使える）。',
 };
 
-module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS };
+// ジョニー考案の夜景ドライブデートプラン集（車を使えるデートの相談時に提案する具体案）
+const NIGHT_DRIVE_DATE = {
+  concept: '夜景ドライブデートは、雨天だと代替案が難しくなる弱点があるため、天候が読める日に限定して提案するのが望ましい。ルートの中で「渋い/かっこいい景色→洗練された美しい景色」のようにテイストの異なる夜景を周遊させ、車窓の変化そのものをデートの演出にするのが設計の肝。',
+  tokyoTowerCourse: '【東京タワー×レインボーブリッジ周遊コース】三田交差点を起点に、首都高で東京タワーの間近を通ってレインボーブリッジを渡り、有明から豊洲方面（タワマン群の夜景）を周遊して三田交差点に戻る。食事は東京タワー目の前の肉料理店「ワカヌイ グリル ダイニング バー 東京」（東京都港区芝公園3-4-30 32芝公園ビル10F、https://tabelog.com/tokyo/A1307/A130704/13124827/ ）でニュージーランド産ラムチョップステーキ、が一案。',
+  aoyamaCourse: '【外苑前・青山グランドホテル2軒はしごコース】1軒目は「THE BELCOMO」（東京都港区北青山2-14-4 THE AOYAMA GRAND HOTEL 4F、050-5570-5154、https://tabelog.com/tokyo/A1306/A130603/13249631/ ）でアッパーなBGMと店内の暗さでムーディに演出して食事。2軒目は同ホテル最上階のルーフトップバー「The Top.」（同住所20F、050-5593-4773、https://tabelog.com/tokyo/A1306/A130603/13250585/ ）へ移動し、ボタニカルでラグジュアリーな雰囲気で大人デートを締める。',
+  factoryToMinatomiraiCourse: '【京浜工業地帯の工場夜景→みなとみらいディナー コース】テーマは「非日常な工場夜景→洗練された港町の夜景と美食」へのグラデーション。おすすめは秋〜春、または涼しい初夏・初秋の夜。①17:00〜17:30 首都高湾岸線等で川崎・横浜の工場夜景スポットへ出発（車内BGMをムーディに） ②17:30〜18:30 川崎マリエン展望台や千鳥町・浮島町周辺で工場夜景を鑑賞（「映画のセットみたい」等、非日常の感動を最初に共有する導入パート） ③18:30〜19:15 首都高・一般道で約20〜30分かけてみなとみらいへ移動、車窓が徐々に洗練された夜景に変わる過程を楽しむ ④19:15〜21:30 みなとみらいや赤レンガ倉庫・馬車道周辺で夜景の見えるイタリアン/フレンチ等のディナー（工場夜景の「渋さ」から一転、洗練された美しさの中で食事） ⑤21:30〜 新港サークルウォークや大さん橋を軽くドライブしてベイブリッジの夜景を締めに見て解散。',
+  tips: '工場夜景は男性ウケのイメージが強いが実際は女性のテンションも上がりやすく、「映画のセットみたい」等の共通の感想で車内トークが弾みやすい。ディナー店は「夜景の見える席」か「落ち着いた個室・カウンター」を選び、工場夜景のアクティブな感動との緩急（ギャップ）を意図的に作ると魅力が増す。',
+};
+
+module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS, NIGHT_DRIVE_DATE };
