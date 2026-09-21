@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS, NIGHT_DRIVE_DATE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS, NIGHT_DRIVE_DATE, DINING_COURSES } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -212,9 +212,11 @@ ${Object.entries(JOHNNY_COLUMNS).map(([title, body]) => `### ${title}\n${body}`)
 【夜景ドライブデートプラン（車を使うデート相談の具体案として使う）】
 - コンセプト: ${NIGHT_DRIVE_DATE.concept}
 - 東京タワー×レインボーブリッジ周遊コース: ${NIGHT_DRIVE_DATE.tokyoTowerCourse}
-- 外苑前・青山グランドホテル2軒はしごコース: ${NIGHT_DRIVE_DATE.aoyamaCourse}
 - 京浜工業地帯の工場夜景→みなとみらいディナーコース: ${NIGHT_DRIVE_DATE.factoryToMinatomiraiCourse}
 - 成功のポイント: ${NIGHT_DRIVE_DATE.tips}
+
+【はしご(1軒目→2軒目)形式のディナー・バーコース（車移動を伴わない大人デート向け）】
+- 外苑前・青山グランドホテル2軒はしごコース: ${DINING_COURSES.aoyamaCourse}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
