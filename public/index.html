@@ -281,6 +281,7 @@ function renderHistory(){
       </div>
       <span class="hi-time">${escapeHtml(h.time)}</span>
       <div class="hi-menu" id="hiMenu-${h.idx}" style="display:none">
+        <button onclick="event.stopPropagation(); renameHistoryEntry(${h.idx})">✏️ 名前を変更</button>
         <button onclick="event.stopPropagation(); exportHistoryEntry(${h.idx})">📤 エクスポート</button>
         <button class="hi-danger" onclick="event.stopPropagation(); deleteHistoryEntry(${h.idx})">🗑 削除</button>
       </div>
@@ -344,6 +345,18 @@ document.addEventListener('click', () => {
 });
 function deleteHistoryEntry(idx){
   history.splice(idx, 1);
+  saveHistory();
+  renderHistory();
+}
+// 履歴の表示名を変更する（例:「【pairs】〇〇さん」のように、女性ごと・アプリごとに管理できるようにする）
+function renameHistoryEntry(idx){
+  const h = history[idx];
+  if(!h) return;
+  const next = window.prompt('この履歴の名前を入力してください（例: 【pairs】〇〇さん）', h.label);
+  if(next === null) return; // キャンセル
+  const trimmed = next.trim();
+  if(!trimmed) return;
+  h.label = trimmed.slice(0, 40);
   saveHistory();
   renderHistory();
 }
