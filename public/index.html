@@ -532,6 +532,8 @@ function renderInline(s){
   let out = escapeHtml(s);
   out = out.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
   out = out.replace(/`(.+?)`/g, '<code>$1</code>');
+  // Web検索の参考リンク等、[表示名](URL)形式のMarkdownリンクをクリック可能にする
+  out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
   return out;
 }
 

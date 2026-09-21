@@ -273,15 +273,19 @@ NGになるのは「語りすぎること」や「今の相手と元カノを比
 その質問に自然な会話文（Markdown可）で答えてよい。診断結果を踏まえた具体的なアドバイスを続けること。
 
 【具体的な店名・施設名を挙げる際の注意（最重要）】
-現時点でAIジョニーは実際の店舗検索APIには接続されておらず、学習知識からの推測で
-店名・住所・特徴を挙げている。学習知識は古かったり不正確だったりする可能性があるため、
-ユーザーが実際に予約・訪問する前に必ず自分で確認できるよう、以下を徹底すること。
-- 具体的な店名を1つ挙げるごとに、その店を検索・確認できるURL
-  （食べログ／Googleマップ／その店の公式サイトなど、実在すると分かる形のリンク）を必ず併記する
-  （正確なURLが分からない場合は、店名の食べログ検索結果ページや「食べログで『店名 恵比寿』と検索」のように、
-  ユーザーがすぐ調べ直せる検索導線を示すこと。存在しないURLをでっち上げないこと）
-- 提案の直後や末尾に一言、「店名・住所・営業状況は変わっている可能性があるので、
-  予約前に必ず自分でも確認してね」という趣旨の注意書きを添えること
+AIジョニーにはWeb検索ツールが備わっている。ユーザーから特定エリア・ジャンルの
+「おすすめの店を教えて」「〇〇エリアで△△なお店を探して」のような、学習知識だけでは
+古かったり不正確だったりする可能性が高い具体的な店舗・スポットの提案を求められた場合は、
+必ずWeb検索を実行してから回答すること。記憶や推測だけで店名・住所・特徴をでっち上げないこと。
+- 検索結果に基づいて、実在する店名・エリア・特徴（雰囲気、値段帯、おすすめメニュー等）を提案する
+- なぜその店を選んだのか（検索で分かった特徴・評判・タイプとの相性等）の根拠を添える
+- 各店舗の情報源となったURL（食べログ／Googleマップ／公式サイト等）を必ず併記する
+  （回答の末尾に「参考リンク」が自動付与される場合はそれで足りるが、本文中でも店名の後に
+  一言リンクへの言及を添えると親切）
+- 検索しても該当情報が見つからない・確信が持てない場合は、正直にその旨を伝え、
+  存在しない店名を創作しないこと
+- 提案の末尾に一言、「店名・住所・営業状況・価格は変動している可能性があるので、
+  予約前に必ず自分でも最新情報を確認してね」という趣旨の注意書きを添えること
 
 【デートログ（冒険の書）を踏まえたレストラン・デートプラン提案について】
 ユーザーが「冒険の書」のエクスポート文（Markdown末尾に\`\`\`json ブロックを含む）を貼り付けた場合、
@@ -380,6 +384,14 @@ module.exports = async (req, res) => {
         max_tokens: 4096,
         system: systemForRequest,
         messages,
+        // 実店舗・実在スポットの提案精度を上げるため、Anthropicのサーバー実行型Web検索ツールを有効化。
+        // Claude自身が必要と判断した時だけ検索し(最大5回/リクエスト)、結果には出典URLが付く
+        tools: [{
+          type: 'web_search_20250305',
+          name: 'web_search',
+          max_uses: 5,
+          user_location: { type: 'approximate', country: 'JP' },
+        }],
       }),
     });
 
@@ -390,14 +402,22 @@ module.exports = async (req, res) => {
     }
 
     const data = await response.json();
-    const resultText = (data.content || [])
-      .filter((b) => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n');
+    const textBlocks = (data.content || []).filter((b) => b.type === 'text');
+    const resultText = textBlocks.map((b) => b.text).join('\n');
+    // Web検索が使われた場合の出典(citations)を、本文の末尾に参考リンクとしてまとめる
+    const sources = [];
+    textBlocks.forEach((b) => {
+      (b.citations || []).forEach((c) => {
+        if (c.url && !sources.some((s) => s.url === c.url)) sources.push({ url: c.url, title: c.title || c.url });
+      });
+    });
+    const sourcesText = sources.length
+      ? '\n\n---\n参考リンク:\n' + sources.map((s) => `- [${s.title}](${s.url})`).join('\n')
+      : '';
     // 出力上限で文章が途中で切れた場合、フロント側で「続きがあります」と案内できるようフラグを返す
     const truncated = data.stop_reason === 'max_tokens';
 
-    res.status(200).json({ result: resultText, truncated });
+    res.status(200).json({ result: resultText + sourcesText, truncated });
   } catch (err) {
     res.status(500).json({ error: `サーバーエラー: ${err.message}` });
   }
