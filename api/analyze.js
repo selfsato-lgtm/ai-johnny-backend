@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -205,6 +205,9 @@ LOVEQUESTのステータス「経験値・行動力・包容力・魅了力」�
 - 告白前の10チェックリスト: ${ROADMAP_100DAYS.confessionChecklist10}
 - 告白のシチュエーション設計: ${ROADMAP_100DAYS.confessionSetting}
 - 保留になった時の対応: ${ROADMAP_100DAYS.confessionPending}
+
+【ジョニーのコラム記事（本人の持論・口調の引き出し。関連する話題が出た時に自然に絡めてよい）】
+${Object.entries(JOHNNY_COLUMNS).map(([title, body]) => `### ${title}\n${body}`).join('\n\n')}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、

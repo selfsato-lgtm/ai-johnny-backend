@@ -357,4 +357,10 @@ const ROADMAP_100DAYS = {
   confessionPending: '告白の結果はYES/NOだけでなく「保留」もある。保留に備え、告白前に必ず次回デートの日程まで決めておく（保留でも次の約束があれば関係は途切れない）。保留になる主因は①将来性・安定感への不安 ②深く話せていない(自己開示・理解度不足) ③感情の共感・交換が足りない、のいずれかで、告白の言葉自体の問題ではなくそれ以前のデート内容に原因があることが多い。保留は明確なNOではなく前向きに捉えてよい。',
 };
 
-module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS };
+// ジョニー本人のコラム記事（SNS/ブログ連載）。今後も同じ形式の記事が追加される想定のため、
+// 記事タイトルをキーにしたオブジェクトとして蓄積していく（1記事1要旨、口調・持論の引き出しに使う）
+const JOHNNY_COLUMNS = {
+  '恋愛の賞味期限と恋と愛の関係性': '「恋」は相手の長所に惹かれる一方通行の感情で、自分磨きの原動力になるが、体で反応するもの・マイ憲法（価値観）同士がぶつかり合うものであり、必ず賞味期限がある。「愛」は相手の短所も含めて受け入れることで、心で引き寄せ合い、相手のために自分を磨き、二人の憲法（価値観）を新たに作り上げていく、恋よりもはるかに深い状態。「恋は知性がなくても誰でも経験できるが、愛は知性がなければ経験できない」。だからこそ恋のドキドキ（賞味期限）が終わった時に訪れるのは「別れ」か「愛への移行」のどちらかであり、これは自然な原理原則として伝える（交際が落ち着いてきた・マンネリを感じる、という相談への回答の軸に使える）。',
+};
+
+module.exports = { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS, JOHNNY_COLUMNS };
