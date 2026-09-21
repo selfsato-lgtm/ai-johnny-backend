@@ -1,4 +1,4 @@
-const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE } = require('./knowledge');
+const { BASE, TYPES, MASTER_TRAITS, ELEMENT_GUIDE, EXPRESSION_STYLES, EXPRESSION_VARIANTS, COMMUNICATION_GUIDE, PARTNERSHIP_GUIDE, DATE_PSYCHOLOGY, SHORT_TERM_STRATEGY, LCIQ_ESSENCE, KING_OF_DATE, ROMANCE_POWER, ATTRACTION_POWER, MATCHING_APP_GUIDE, ROADMAP_100DAYS } = require('./knowledge');
 const { extractDateLogsFromText, buildDateLogAvoidanceNote } = require('./datelog');
 const { verifySessionToken, SESSION_COOKIE_NAME } = require('../lib/session');
 const { isActiveMember } = require('../lib/membership');
@@ -191,6 +191,20 @@ LOVEQUESTのステータス「経験値・行動力・包容力・魅了力」�
 - デートへの誘い方（だったら戦略）: ${MATCHING_APP_GUIDE.strategicInvite}
 - 確率の目安: ${MATCHING_APP_GUIDE.conversionRates}
 - 複数人と並行する際のデート予算配分: ${MATCHING_APP_GUIDE.dateBudget}
+
+【100日逆算ロードマップ（「年内彼女を作る100日逆算ロードマップセミナー」より、既出資料と重複しない部分のみ）】
+年内・期限つきで恋愛を成就させたい相談（クリスマス・年末等）で、SHORT_TERM_STRATEGYと合わせて使う。
+- フェーズ管理: ${ROADMAP_100DAYS.phaseManagement}
+- 出会いの母数計算: ${ROADMAP_100DAYS.funnelMath}
+- 誘いの鮮度: ${ROADMAP_100DAYS.inviteFreshness}
+- 自然に予定が決まる誘い方: ${ROADMAP_100DAYS.naturalInviteFlow}
+- NGな誘い文句: ${ROADMAP_100DAYS.ngInvitePhrases}
+- 1回目と2回目デートの役割の違い: ${ROADMAP_100DAYS.firstVsSecondDateRoles}
+- 体験型デートの設計(安心と刺激の交差): ${ROADMAP_100DAYS.experienceDateStructure}
+- 告白が成就する5つの法則: ${ROADMAP_100DAYS.confessionFiveLaws}
+- 告白前の10チェックリスト: ${ROADMAP_100DAYS.confessionChecklist10}
+- 告白のシチュエーション設計: ${ROADMAP_100DAYS.confessionSetting}
+- 保留になった時の対応: ${ROADMAP_100DAYS.confessionPending}
 
 【手がかりの読み方（インパスメソッド）】
 写真の表情・仕草、服装・色使い、職業、趣味の「動機」（例: 旅行が計画型か直感型か）、
