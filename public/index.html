@@ -654,12 +654,23 @@ async function sendToJohnny(userContent, userDisplayText){
   typingBubble.scrollIntoView({behavior:'smooth', block:'end'});
 
   try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ messages: conversation }),
-    });
-    const data = await res.json();
+    // 一時的な切断・タイムアウト(JSON以外の応答)は1回だけ自動で再送する
+    let res, data;
+    for(let attempt = 0; attempt < 2; attempt++){
+      try {
+        res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ messages: conversation }),
+        });
+        const raw = await res.text();
+        try { data = JSON.parse(raw); }
+        catch(e){ data = { error: `サーバーが時間内に応答できませんでした(HTTP ${res.status})。もう一度送信してください。` }; }
+        if(res.ok || attempt === 1 || (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429)) break;
+      } catch(e){
+        if(attempt === 1) throw e;
+      }
+    }
 
     typingBubble.remove();
     const resultBubble = document.createElement('div');
