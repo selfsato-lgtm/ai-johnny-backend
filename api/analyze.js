@@ -385,11 +385,11 @@ module.exports = async (req, res) => {
         system: systemForRequest,
         messages,
         // 実店舗・実在スポットの提案精度を上げるため、Anthropicのサーバー実行型Web検索ツールを有効化。
-        // Claude自身が必要と判断した時だけ検索し(最大5回/リクエスト)、結果には出典URLが付く
+        // Claude自身が必要と判断した時だけ検索し(最大3回/リクエスト)、結果には出典URLが付く
         tools: [{
           type: 'web_search_20250305',
           name: 'web_search',
-          max_uses: 5,
+          max_uses: 3,
           user_location: { type: 'approximate', country: 'JP' },
         }],
       }),
