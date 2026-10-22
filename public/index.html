@@ -653,6 +653,7 @@ async function sendToJohnny(userContent, userDisplayText){
   log.appendChild(typingBubble);
   typingBubble.scrollIntoView({behavior:'smooth', block:'end'});
 
+  let stage = '送信';
   try {
     // 一時的な切断・タイムアウト(JSON以外の応答)は1回だけ自動で再送する
     let res, data;
@@ -672,6 +673,7 @@ async function sendToJohnny(userContent, userDisplayText){
       }
     }
 
+    stage = '表示';
     typingBubble.remove();
     const resultBubble = document.createElement('div');
     resultBubble.className = 'bubble';
@@ -705,7 +707,7 @@ async function sendToJohnny(userContent, userDisplayText){
     typingBubble.remove();
     const errBubble = document.createElement('div');
     errBubble.className = 'bubble';
-    errBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">通信エラー: ${escapeHtml(err.message)}</p></div>`;
+    errBubble.innerHTML = `<div class="b-avatar">⚠️</div><div class="b-body"><p style="color:var(--red)">通信エラー(${stage}・v3): ${escapeHtml(err.message)}</p></div>`;
     log.appendChild(errBubble);
   }
 }
